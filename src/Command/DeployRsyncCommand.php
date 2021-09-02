@@ -39,12 +39,14 @@ final class DeployRsyncCommand extends Command
 
     protected static $defaultName = 'ecommit:deploy-rsync';
 
+    protected static $defaultDescription = 'Deploy the application with RSYNC and SSH';
+
     protected function configure(): void
     {
         $this
             ->addArgument('environment', InputArgument::REQUIRED, 'Environment name')
             ->addOption('go', null, InputOption::VALUE_NONE, 'Do the deployment')
-            ->setDescription('Deploy the application with RSYNC and SSH')
+            ->setDescription(self::$defaultDescription) //Compatibility with Symfony < 5.3
         ;
     }
 

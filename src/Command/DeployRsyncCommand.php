@@ -46,7 +46,6 @@ final class DeployRsyncCommand extends Command
         $this
             ->addArgument('environment', InputArgument::REQUIRED, 'Environment name')
             ->addOption('go', null, InputOption::VALUE_NONE, 'Do the deployment')
-            ->setDescription(self::$defaultDescription) //Compatibility with Symfony < 5.3
         ;
     }
 

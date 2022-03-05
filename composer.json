@@ -23,11 +23,11 @@
     },
     "require": {
         "php": "^7.2|^8.0",
-        "symfony/config": "^4.4.12|^5.1.4",
-        "symfony/console": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4.12|^5.1.4",
-        "symfony/framework-bundle": "^4.4|^5.0",
-        "symfony/process": "^4.4|^5.0"
+        "symfony/config": "^4.4.12|^5.4",
+        "symfony/console": "^4.4|^5.4",
+        "symfony/dependency-injection": "^4.4.12|^5.4",
+        "symfony/framework-bundle": "^4.4|^5.4",
+        "symfony/process": "^4.4|^5.4"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.3",

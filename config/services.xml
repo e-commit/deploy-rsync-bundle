@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Ecommit\DeployRsyncBundle\Command\DeployRsyncCommand" class="Ecommit\DeployRsyncBundle\Command\DeployRsyncCommand" public="false">
+        <service id="ecommit_deploy_rsync.command.deploy_rsync" class="Ecommit\DeployRsyncBundle\Command\DeployRsyncCommand" public="false">
             <argument>%ecommit_deploy_rsync.environments%</argument>
             <argument>%ecommit_deploy_rsync.rsync%</argument>
             <argument>%kernel.project_dir%</argument>

@@ -24,8 +24,19 @@ use Symfony\Component\Process\Process;
 
 final class DeployRsyncCommand extends Command
 {
+    /**
+     * @var array
+     */
     protected $environments;
+
+    /**
+     * @var array
+     */
     protected $rsyncConfig;
+
+    /**
+     * @var string
+     */
     protected $projetDir;
 
     public function __construct(array $environments, array $rsyncConfig, string $projetDir)

@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress UndefinedMethod
      */
     public function getConfigTreeBuilder()
     {

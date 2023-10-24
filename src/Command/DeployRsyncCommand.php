@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Ecommit\DeployRsyncBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Process\Process;
 
+#[AsCommand(name: 'ecommit:deploy-rsync', description: 'Deploy the application with RSYNC and SSH')]
 final class DeployRsyncCommand extends Command
 {
     /**
@@ -48,9 +50,9 @@ final class DeployRsyncCommand extends Command
         parent::__construct();
     }
 
-    protected static $defaultName = 'ecommit:deploy-rsync';
+    protected static $defaultName = 'ecommit:deploy-rsync'; // PHP < 8
 
-    protected static $defaultDescription = 'Deploy the application with RSYNC and SSH';
+    protected static $defaultDescription = 'Deploy the application with RSYNC and SSH'; // PHP < 8
 
     protected function configure(): void
     {

@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @psalm-suppress UndefinedMethod
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('ecommit_deploy_rsync');
         $rootNode = $treeBuilder->getRootNode();

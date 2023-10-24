@@ -24,12 +24,12 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-mbstring": "*",
-        "symfony/config": "^5.4|^6.3",
-        "symfony/console": "^5.4|^6.3",
-        "symfony/dependency-injection": "^5.4|^6.3",
-        "symfony/framework-bundle": "^5.4|^6.3",
-        "symfony/http-kernel": "^5.4|^6.3",
-        "symfony/process": "^5.4|^6.3"
+        "symfony/config": "^5.4|^6.3|^7.0",
+        "symfony/console": "^5.4|^6.3|^7.0",
+        "symfony/dependency-injection": "^5.4|^6.3|^7.0",
+        "symfony/framework-bundle": "^5.4|^6.3|^7.0",
+        "symfony/http-kernel": "^5.4|^6.3|^7.0",
+        "symfony/process": "^5.4|^6.3|^7.0"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.3",

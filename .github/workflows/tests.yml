@@ -103,14 +103,6 @@ jobs:
                 if: matrix.symfony-version && contains(matrix.symfony-version, '@dev')
                 run: composer config minimum-stability dev
 
-            -   name: Remove friendsofphp/php-cs-fixer
-                if: matrix.coding-standards != true
-                run: composer remove friendsofphp/php-cs-fixer --dev --no-update
-
-            -   name: Remove vimeo/psalm
-                if: matrix.static-analysis != true
-                run: composer remove vimeo/psalm --dev --no-update
-
             -   name: Configure Symfony Flex
                 if: matrix.symfony-version
                 run: composer config extra.symfony.require ${{ matrix.symfony-version }}
@@ -136,6 +128,6 @@ jobs:
                 if: matrix.coding-standards
                 run: cat LICENSE |grep -E "\(c\) ([0-9]+\-)*`date +%G`"
 
-            -   name: Run Psalm
+            -   name: Run PHPStan
                 if: matrix.static-analysis
-                run: php vendor/bin/psalm --stats --output-format=github
+                run: php vendor/bin/phpstan --no-progress --error-format=github

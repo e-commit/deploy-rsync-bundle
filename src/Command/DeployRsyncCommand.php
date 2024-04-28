@@ -16,6 +16,7 @@ namespace Ecommit\DeployRsyncBundle\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,32 +31,13 @@ final class DeployRsyncCommand extends Command
     public const TARGET_SSH_REGEX = '/^ssh:\/\/(?<username>.+)@(?<hostname>[^:]+)(:(?<port>\d+)){0,1}:(?<path>.+)$/';
 
     /**
-     * @var array
+     * @param array<string, array{target: string, rsync_options?: string[], ignore_file?: string}> $environments
+     * @param array{rsync_path: string, rsync_options: string[], ignore_file: ?string}             $rsyncConfig
      */
-    protected $environments;
-
-    /**
-     * @var array
-     */
-    protected $rsyncConfig;
-
-    /**
-     * @var string
-     */
-    protected $projetDir;
-
-    public function __construct(array $environments, array $rsyncConfig, string $projetDir)
+    public function __construct(protected array $environments, protected array $rsyncConfig, protected string $projetDir)
     {
-        $this->environments = $environments;
-        $this->rsyncConfig = $rsyncConfig;
-        $this->projetDir = $projetDir;
-
         parent::__construct();
     }
-
-    protected static $defaultName = 'ecommit:deploy-rsync'; // PHP < 8
-
-    protected static $defaultDescription = 'Deploy the application with RSYNC and SSH'; // PHP < 8
 
     protected function configure(): void
     {
@@ -67,13 +49,16 @@ final class DeployRsyncCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!\array_key_exists($input->getArgument('environment'), $this->environments)) {
-            throw new RuntimeException('Environment not found: '.$input->getArgument('environment'));
+        /** @var string $environmentName */
+        $environmentName = $input->getArgument('environment');
+        if (!\array_key_exists($environmentName, $this->environments)) {
+            throw new RuntimeException('Environment not found: '.$environmentName);
         }
-        $environment = $this->environments[$input->getArgument('environment')];
+        $environment = $this->environments[$environmentName];
 
         $ignoreFile = $environment['ignore_file'] ?? $this->rsyncConfig['ignore_file'];
         if (!$ignoreFile) {
+            /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion('Continue without ignore file? [y/N]', false);
 
@@ -123,12 +108,18 @@ final class DeployRsyncCommand extends Command
         return $dir;
     }
 
-    protected function executeProcess(array $command): \Iterator
+    /**
+     * @param string[] $command
+     *
+     * @return \Generator<array-key, string>
+     */
+    protected function executeProcess(array $command): \Generator
     {
         $process = $this->createProcess($command);
         $process->start();
 
-        foreach ($process as $type => $data) {
+        /** @var string $data */
+        foreach ($process as $data) {
             yield $data;
         }
 
@@ -137,6 +128,9 @@ final class DeployRsyncCommand extends Command
         }
     }
 
+    /**
+     * @param string[] $command
+     */
     protected function createProcess(array $command): Process
     {
         return new Process($command);

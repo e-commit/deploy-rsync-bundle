@@ -413,7 +413,7 @@ class DeployRsyncCommandTest extends TestCase
         $class = new \ReflectionClass(DeployRsyncCommand::class);
         $method = $class->getMethod('getDirPath');
         $method->setAccessible(true);
-        $command = new DeployRsyncCommand([], [], '');
+        $command = new DeployRsyncCommand([], [], ''); // @phpstan-ignore-line
 
         $this->assertSame($expected, $method->invokeArgs($command, [$dir]));
     }
@@ -430,9 +430,9 @@ class DeployRsyncCommandTest extends TestCase
         ];
     }
 
-    protected function createCommandTester(array $config, array $expectedCommand, $isSuccessful): CommandTester
+    protected function createCommandTester(array $config, array $expectedCommand, bool $isSuccessful): CommandTester
     {
-        $command = $this->getMockBuilder(DeployRsyncCommand::class)
+        $command = $this->getMockBuilder(DeployRsyncCommand::class) // @phpstan-ignore-line
             ->setConstructorArgs([$config['environments'], $config['rsync'], '/local/path'])
             ->onlyMethods(['createProcess'])
             ->getMock();

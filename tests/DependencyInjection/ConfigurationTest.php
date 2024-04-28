@@ -40,19 +40,21 @@ class ConfigurationTest extends TestCase
         $configuration = $this->processConfiguration([
             'environments' => [
                 'env1' => [
-                    'hostname' => 'host1',
-                    'username' => 'username1',
-                    'dir' => '/path1',
+                    'target' => 'ssh://username1@host1:/path1',
+                ],
+                'env2' => [
+                    'target' => 'file:///path2',
                 ],
             ],
         ]);
         $expected = [
             'environments' => [
                 'env1' => [
-                    'hostname' => 'host1',
-                    'username' => 'username1',
-                    'dir' => '/path1',
-                    'port' => 22,
+                    'target' => 'ssh://username1@host1:/path1',
+                    'rsync_options' => [],
+                ],
+                'env2' => [
+                    'target' => 'file:///path2',
                     'rsync_options' => [],
                 ],
             ],
@@ -66,43 +68,25 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expected, $configuration);
     }
 
-    public function testMissingEnvironmentHostname(): void
+    public function testMissingEnvironmentTarget(): void
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches('/hostname.+must be configured/');
+        $this->expectExceptionMessageMatches('/target.+must be configured/');
         $this->processConfiguration([
             'environments' => [
-                'env1' => [
-                    'username' => 'username1',
-                    'dir' => '/path1',
-                ],
+                'env1' => [],
             ],
         ]);
     }
 
-    public function testMissingEnvironmentUsername(): void
+    public function testBadEnvironmentTarget(): void
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches('/username.+must be configured/');
+        $this->expectExceptionMessageMatches('/Invalid target/');
         $this->processConfiguration([
             'environments' => [
                 'env1' => [
-                    'hostname' => 'host1',
-                    'dir' => '/path1',
-                ],
-            ],
-        ]);
-    }
-
-    public function testMissingEnvironmenDir(): void
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches('/dir.+must be configured/');
-        $this->processConfiguration([
-            'environments' => [
-                'env1' => [
-                    'hostname' => 'host1',
-                    'username' => 'username1',
+                    'target' => 'fake://hello',
                 ],
             ],
         ]);

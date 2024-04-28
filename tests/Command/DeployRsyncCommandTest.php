@@ -22,9 +22,23 @@ use Symfony\Component\Process\Process;
 
 class DeployRsyncCommandTest extends TestCase
 {
-    public function testSuccess(): void
+    /**
+     * @dataProvider getTestSuccessProvider
+     */
+    public function testSuccess(string $environment, array $expectedCommand): void
     {
-        $expectedCommand = [
+        $commandTester = $this->createCommandTester($this->getDefaultConfig(), $expectedCommand, true);
+        $exitCode = $commandTester->execute([
+            'environment' => $environment,
+        ]);
+
+        $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
+        $this->assertSame(0, $exitCode);
+    }
+
+    public function getTestSuccessProvider(): \Generator
+    {
+        yield ['env1', [
             'rsync',
             '--dry-run',
             '-azC',
@@ -36,20 +50,51 @@ class DeployRsyncCommandTest extends TestCase
             'ssh -p22',
             '/local/path/',
             'username1@host1:/path1/',
-        ];
+        ]];
+        yield ['env2', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
+    }
 
+    /**
+     * @dataProvider getTestSuccessGoProvider
+     */
+    public function testSuccessGo(string $environment, array $expectedCommand): void
+    {
         $commandTester = $this->createCommandTester($this->getDefaultConfig(), $expectedCommand, true);
         $exitCode = $commandTester->execute([
-            'environment' => 'env1',
+            'environment' => $environment,
+            '--go' => true,
         ]);
 
         $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
         $this->assertSame(0, $exitCode);
     }
 
-    public function testSuccessGo(): void
+    public function getTestSuccessGoProvider(): \Generator
     {
-        $expectedCommand = [
+        yield ['env1', [
             'rsync',
             '-azC',
             '--force',
@@ -60,16 +105,29 @@ class DeployRsyncCommandTest extends TestCase
             'ssh -p22',
             '/local/path/',
             'username1@host1:/path1/',
-        ];
-
-        $commandTester = $this->createCommandTester($this->getDefaultConfig(), $expectedCommand, true);
-        $exitCode = $commandTester->execute([
-            'environment' => 'env1',
-            '--go' => true,
-        ]);
-
-        $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
-        $this->assertSame(0, $exitCode);
+        ]];
+        yield ['env2', [
+            'rsync',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
     }
 
     public function testWithBadEnv(): void
@@ -84,9 +142,26 @@ class DeployRsyncCommandTest extends TestCase
         ]);
     }
 
-    public function testSuccessWithoutIgnoreFile(): void
+    /**
+     * @dataProvider getTestSuccessWithoutIgnoreFileProvider
+     */
+    public function testSuccessWithoutIgnoreFile(string $environment, array $expectedCommand): void
     {
-        $expectedCommand = [
+        $config = $this->getDefaultConfig();
+        $config['rsync']['ignore_file'] = null;
+        $commandTester = $this->createCommandTester($config, $expectedCommand, true);
+        $commandTester->setInputs(['y']);
+        $exitCode = $commandTester->execute([
+            'environment' => $environment,
+        ]);
+
+        $this->assertSame("Continue without ignore file? [y/N]line1\nline2\n", $commandTester->getDisplay(true));
+        $this->assertSame(0, $exitCode);
+    }
+
+    public function getTestSuccessWithoutIgnoreFileProvider(): \Generator
+    {
+        yield ['env1', [
             'rsync',
             '--dry-run',
             '-azC',
@@ -97,18 +172,29 @@ class DeployRsyncCommandTest extends TestCase
             'ssh -p22',
             '/local/path/',
             'username1@host1:/path1/',
-        ];
-
-        $config = $this->getDefaultConfig();
-        $config['rsync']['ignore_file'] = null;
-        $commandTester = $this->createCommandTester($config, $expectedCommand, true);
-        $commandTester->setInputs(['y']);
-        $exitCode = $commandTester->execute([
-            'environment' => 'env1',
-        ]);
-
-        $this->assertSame("Continue without ignore file? [y/N]line1\nline2\n", $commandTester->getDisplay(true));
-        $this->assertSame(0, $exitCode);
+        ]];
+        yield ['env2', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
     }
 
     public function testCancelWithoutIgnoreFile(): void
@@ -125,36 +211,25 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function testWithGlobalIgnoreFileAndWithEnvIgnoreFile(): void
+    /**
+     * @dataProvider getTestWithGlobalIgnoreFileAndWithEnvIgnoreFileProvider
+     */
+    public function testWithGlobalIgnoreFileAndWithEnvIgnoreFile(string $environment, array $expectedCommand): void
     {
-        $expectedCommand = [
-            'rsync',
-            '--dry-run',
-            '-azC',
-            '--force',
-            '--delete',
-            '--progress',
-            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
-            '-e',
-            'ssh -p22',
-            '/local/path/',
-            'username1@host1:/path1/',
-        ];
-
         $config = $this->getDefaultConfig();
-        $config['environments']['env1']['ignore_file'] = realpath(__DIR__.'/../ignore_local_file.txt');
+        $config['environments'][$environment]['ignore_file'] = realpath(__DIR__.'/../ignore_local_file.txt');
         $commandTester = $this->createCommandTester($config, $expectedCommand, true);
         $exitCode = $commandTester->execute([
-            'environment' => 'env1',
+            'environment' => $environment,
         ]);
 
         $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
         $this->assertSame(0, $exitCode);
     }
 
-    public function testWithoutGlobalIgnoreFileAndWithEnvIgnoreFile(): void
+    public function getTestWithGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
-        $expectedCommand = [
+        yield ['env1', [
             'rsync',
             '--dry-run',
             '-azC',
@@ -166,23 +241,113 @@ class DeployRsyncCommandTest extends TestCase
             'ssh -p22',
             '/local/path/',
             'username1@host1:/path1/',
-        ];
+        ]];
+        yield ['env2', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
+    }
 
+    /**
+     * @dataProvider getTestWithoutGlobalIgnoreFileAndWithEnvIgnoreFileProvider
+     */
+    public function testWithoutGlobalIgnoreFileAndWithEnvIgnoreFile(string $environment, array $expectedCommand): void
+    {
         $config = $this->getDefaultConfig();
         $config['rsync']['ignore_file'] = null;
-        $config['environments']['env1']['ignore_file'] = realpath(__DIR__.'/../ignore_local_file.txt');
+        $config['environments'][$environment]['ignore_file'] = realpath(__DIR__.'/../ignore_local_file.txt');
         $commandTester = $this->createCommandTester($config, $expectedCommand, true);
         $exitCode = $commandTester->execute([
-            'environment' => 'env1',
+            'environment' => $environment,
         ]);
 
         $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
         $this->assertSame(0, $exitCode);
     }
 
-    public function testWithEnvRsyncOptions(): void
+    public function getTestWithoutGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
-        $expectedCommand = [
+        yield ['env1', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
+            '-e',
+            'ssh -p22',
+            '/local/path/',
+            'username1@host1:/path1/',
+        ]];
+        yield ['env2', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '--dry-run',
+            '-azC',
+            '--force',
+            '--delete',
+            '--progress',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_local_file.txt'),
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
+    }
+
+    /**
+     * @dataProvider getTestWithEnvRsyncOptionsProvider
+     */
+    public function testWithEnvRsyncOptions(string $environment, array $expectedCommand): void
+    {
+        $config = $this->getDefaultConfig();
+        $config['environments'][$environment]['rsync_options'] = [
+            'option1',
+            'option2',
+        ];
+        $commandTester = $this->createCommandTester($config, $expectedCommand, true);
+        $exitCode = $commandTester->execute([
+            'environment' => $environment,
+        ]);
+
+        $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
+        $this->assertSame(0, $exitCode);
+    }
+
+    public function getTestWithEnvRsyncOptionsProvider(): \Generator
+    {
+        yield ['env1', [
             'rsync',
             '--dry-run',
             'option1',
@@ -192,20 +357,27 @@ class DeployRsyncCommandTest extends TestCase
             'ssh -p22',
             '/local/path/',
             'username1@host1:/path1/',
-        ];
-
-        $config = $this->getDefaultConfig();
-        $config['environments']['env1']['rsync_options'] = [
+        ]];
+        yield ['env2', [
+            'rsync',
+            '--dry-run',
             'option1',
             'option2',
-        ];
-        $commandTester = $this->createCommandTester($config, $expectedCommand, true);
-        $exitCode = $commandTester->execute([
-            'environment' => 'env1',
-        ]);
-
-        $this->assertSame("line1\nline2\n", $commandTester->getDisplay(true));
-        $this->assertSame(0, $exitCode);
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '-e',
+            'ssh -p23',
+            '/local/path/',
+            'username2@host2:/path2/',
+        ]];
+        yield ['env3', [
+            'rsync',
+            '--dry-run',
+            'option1',
+            'option2',
+            '--exclude-from='.realpath(__DIR__.'/../ignore_file.txt'),
+            '/local/path/',
+            '/path3/subdir3/',
+        ]];
     }
 
     public function testFailure(): void
@@ -299,10 +471,13 @@ class DeployRsyncCommandTest extends TestCase
         return [
             'environments' => [
                 'env1' => [
-                    'hostname' => 'host1',
-                    'username' => 'username1',
-                    'dir' => '/path1',
-                    'port' => 22,
+                    'target' => 'ssh://username1@host1:/path1',
+                ],
+                'env2' => [
+                    'target' => 'ssh://username2@host2:23:/path2',
+                ],
+                'env3' => [
+                    'target' => 'file:///path3/subdir3',
                 ],
             ],
             'rsync' => [

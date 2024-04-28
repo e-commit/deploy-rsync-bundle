@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Ecommit\DeployRsyncBundle\DependencyInjection;
 
+use Ecommit\DeployRsyncBundle\Command\DeployRsyncCommand;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -33,10 +34,12 @@ class Configuration implements ConfigurationInterface
                     ->normalizeKeys(false)
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('hostname')->isRequired()->end()
-                            ->integerNode('port')->defaultValue(22)->end()
-                            ->scalarNode('username')->isRequired()->end()
-                            ->scalarNode('dir')->isRequired()->end()
+                            ->scalarNode('target')->isRequired()
+                                ->validate()
+                                    ->ifTrue(fn (mixed $value) => !\is_string($value) || (!preg_match(DeployRsyncCommand::TARGET_FILE_REGEX, $value) && !preg_match(DeployRsyncCommand::TARGET_SSH_REGEX, $value)))
+                                    ->thenInvalid('Invalid target')
+                                ->end()
+                            ->end()
                             ->arrayNode('rsync_options')->prototype('scalar')->end()->end()
                             ->scalarNode('ignore_file')->end()
                         ->end()

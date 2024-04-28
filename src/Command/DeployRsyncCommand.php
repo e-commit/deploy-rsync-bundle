@@ -26,6 +26,9 @@ use Symfony\Component\Process\Process;
 #[AsCommand(name: 'ecommit:deploy-rsync', description: 'Deploy the application with RSYNC and SSH')]
 final class DeployRsyncCommand extends Command
 {
+    public const TARGET_FILE_REGEX = '/^file:\/\/(?<path>.+)$/';
+    public const TARGET_SSH_REGEX = '/^ssh:\/\/(?<username>.+)@(?<hostname>[^:]+)(:(?<port>\d+)){0,1}:(?<path>.+)$/';
+
     /**
      * @var array
      */
@@ -92,10 +95,17 @@ final class DeployRsyncCommand extends Command
         if ($ignoreFile) {
             $command[] = '--exclude-from='.$ignoreFile;
         }
-        $command[] = '-e';
-        $command[] = sprintf('ssh -p%s', $environment['port']);
-        $command[] = $this->getDirPath($this->projetDir);
-        $command[] = sprintf('%s@%s:%s', $environment['username'], $environment['hostname'], $this->getDirPath($environment['dir']));
+        if (preg_match(self::TARGET_FILE_REGEX, $environment['target'], $targetPats)) {
+            $command[] = $this->getDirPath($this->projetDir);
+            $command[] = $this->getDirPath($targetPats['path']);
+        } elseif (preg_match(self::TARGET_SSH_REGEX, $environment['target'], $targetPats)) {
+            $command[] = '-e';
+            $command[] = sprintf('ssh -p%s', (isset($targetPats['port']) && '' !== $targetPats['port']) ? $targetPats['port'] : 22);
+            $command[] = $this->getDirPath($this->projetDir);
+            $command[] = sprintf('%s@%s:%s', $targetPats['username'], $targetPats['hostname'], $this->getDirPath($targetPats['path']));
+        } else {
+            throw new \Exception('Invalid target');
+        }
 
         foreach ($this->executeProcess($command) as $data) {
             $output->writeln($data);

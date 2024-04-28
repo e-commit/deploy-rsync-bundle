@@ -31,18 +31,17 @@ ecommit_deploy_rsync:
     #Environments configuration
     environments:
         my_server1: #Environment name
-            hostname: myserver.com #SSH hostname - Required
-            username: myuser #SSH username - Required
-            dir: /home/remote_dir #SSH remote directory - Required
-            #port: 22 #Port - Not required - Default value: 22
+            #Target - Required
+            #The target can be either an SSH target or a local target
+            #SSH target format: ssh://<username>@<hostname>:<path> or ssh://<username>@<hostname>:<port>:<path>
+            #Local target format: file://<path>
+            target: ssh://myuser@myserver.com:/home/remote_dir
             #rsync_options: [] #Rsync command options - Not required - Default values: [] - If not defined, the global rsync_options is used
             #ignore_file: #Rsync ignore file - Not required - Default value: null - If not defined, the global ignore_file option is used
 
         #You can define others environments :
         #my_server2:
-            #hostname: myserver2.com
-            #username: myser
-            #dir: /home/remote_dir
+            #target: ssh://myuser@myserver2.com:/home/remote_dir
     
     #Rsync global configuration
     #rsync:

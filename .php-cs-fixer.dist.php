@@ -19,7 +19,7 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         '@DoctrineAnnotation' => true,
-        '@PHP80Migration' => true,
+        '@PHP81Migration' => true,
         '@PHP80Migration:risky' => true,
         '@PHPUnit84Migration:risky' => true,
         'array_syntax' => ['syntax' => 'short'],

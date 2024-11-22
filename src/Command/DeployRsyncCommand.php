@@ -80,14 +80,14 @@ final class DeployRsyncCommand extends Command
         if ($ignoreFile) {
             $command[] = '--exclude-from='.$ignoreFile;
         }
-        if (preg_match(self::TARGET_FILE_REGEX, $environment['target'], $targetPats)) {
+        if (preg_match(self::TARGET_FILE_REGEX, $environment['target'], $targetParts)) {
             $command[] = $this->getDirPath($this->projetDir);
-            $command[] = $this->getDirPath($targetPats['path']);
-        } elseif (preg_match(self::TARGET_SSH_REGEX, $environment['target'], $targetPats)) {
+            $command[] = $this->getDirPath($targetParts['path']);
+        } elseif (preg_match(self::TARGET_SSH_REGEX, $environment['target'], $targetParts)) {
             $command[] = '-e';
-            $command[] = \sprintf('ssh -p%s', ('' !== $targetPats['port']) ? $targetPats['port'] : 22);
+            $command[] = \sprintf('ssh -p%s', ('' !== $targetParts['port']) ? $targetParts['port'] : 22);
             $command[] = $this->getDirPath($this->projetDir);
-            $command[] = \sprintf('%s@%s:%s', $targetPats['username'], $targetPats['hostname'], $this->getDirPath($targetPats['path']));
+            $command[] = \sprintf('%s@%s:%s', $targetParts['username'], $targetParts['hostname'], $this->getDirPath($targetParts['path']));
         } else {
             throw new \Exception('Invalid target');
         }

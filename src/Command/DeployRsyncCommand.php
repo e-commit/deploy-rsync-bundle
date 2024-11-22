@@ -85,7 +85,7 @@ final class DeployRsyncCommand extends Command
             $command[] = $this->getDirPath($targetPats['path']);
         } elseif (preg_match(self::TARGET_SSH_REGEX, $environment['target'], $targetPats)) {
             $command[] = '-e';
-            $command[] = \sprintf('ssh -p%s', (isset($targetPats['port']) && '' !== $targetPats['port']) ? $targetPats['port'] : 22);
+            $command[] = \sprintf('ssh -p%s', ('' !== $targetPats['port']) ? $targetPats['port'] : 22);
             $command[] = $this->getDirPath($this->projetDir);
             $command[] = \sprintf('%s@%s:%s', $targetPats['username'], $targetPats['hostname'], $this->getDirPath($targetPats['path']));
         } else {

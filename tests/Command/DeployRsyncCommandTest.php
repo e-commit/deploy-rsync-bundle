@@ -458,10 +458,14 @@ class DeployRsyncCommandTest extends TestCase
             $command->expects($this->never())->method('createProcess');
         }
 
-        $command->setName(DeployRsyncCommand::getDefaultName());
+        $command->setName('ecommit:deploy-rsync');
 
         $application = new Application();
-        $application->add($command);
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else { // @legacy SF <= 7.4
+            $application->add($command);
+        }
 
         return new CommandTester($application->find('ecommit:deploy-rsync'));
     }

@@ -16,7 +16,7 @@ namespace Ecommit\DeployRsyncBundle\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class EcommitDeployRsyncExtension extends Extension
 {
@@ -25,8 +25,8 @@ class EcommitDeployRsyncExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
-        $loader->load('services.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
+        $loader->load('deploy_rsync.php');
 
         $container->setParameter('ecommit_deploy_rsync.environments', $config['environments']);
         $container->setParameter('ecommit_deploy_rsync.rsync', $config['rsync']);

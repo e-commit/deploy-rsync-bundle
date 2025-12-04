@@ -3,3 +3,7 @@ parameters:
         -
             message: '#no value type specified in iterable type array#'
             path: tests/
+
+        # @legacy SF <= 7.4
+        -
+            message: '#Call to function method_exists\(\) with Symfony\\Component\\Console\\Application and .addCommand. will always evaluate to false#'

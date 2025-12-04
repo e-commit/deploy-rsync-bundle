@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace Ecommit\DeployRsyncBundle\Tests\Command;
 
 use Ecommit\DeployRsyncBundle\Command\DeployRsyncCommand;
+use Ecommit\DeployRsyncBundle\DependencyInjection\Configuration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
+/**
+ * @phpstan-import-type ProcessedConfiguration from Configuration
+ */
 class DeployRsyncCommandTest extends TestCase
 {
     /**
@@ -437,7 +441,7 @@ class DeployRsyncCommandTest extends TestCase
             ->getMock();
 
         if (\count($expectedCommand) > 0) {
-            $command->expects($this->once())->method('createProcess')->with($expectedCommand)->willReturnCallback(function ($command) use ($isSuccessful) {
+            $command->expects($this->once())->method('createProcess')->with($expectedCommand)->willReturnCallback(function ($command) use ($isSuccessful) { // @phpstan-ignore-line
                 $process = $this->getMockBuilder(Process::class)
                     ->setConstructorArgs([$command])
                     ->onlyMethods(['start', 'getIterator', 'isSuccessful'])
@@ -454,7 +458,7 @@ class DeployRsyncCommandTest extends TestCase
                 return $process;
             });
         } else {
-            $command->expects($this->never())->method('createProcess');
+            $command->expects($this->never())->method('createProcess'); // @phpstan-ignore-line
         }
 
         $command->setName('ecommit:deploy-rsync');
@@ -469,6 +473,9 @@ class DeployRsyncCommandTest extends TestCase
         return new CommandTester($application->find('ecommit:deploy-rsync'));
     }
 
+    /**
+     * @return ProcessedConfiguration
+     */
     protected function getDefaultConfig(): array
     {
         return [
@@ -486,7 +493,7 @@ class DeployRsyncCommandTest extends TestCase
             'rsync' => [
                 'rsync_path' => 'rsync',
                 'rsync_options' => ['-azC', '--force', '--delete', '--progress'],
-                'ignore_file' => realpath(__DIR__.'/../ignore_file.txt'),
+                'ignore_file' => (string) realpath(__DIR__.'/../ignore_file.txt'),
             ],
         ];
     }

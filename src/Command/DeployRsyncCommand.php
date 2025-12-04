@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Ecommit\DeployRsyncBundle\Command;
 
+use Ecommit\DeployRsyncBundle\DependencyInjection\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -24,6 +25,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Process\Process;
 
+/**
+ * @phpstan-import-type Environments from Configuration
+ * @phpstan-import-type RsyncConfig from Configuration
+ */
 #[AsCommand(name: 'ecommit:deploy-rsync', description: 'Deploy the application with RSYNC and SSH')]
 final class DeployRsyncCommand extends Command
 {
@@ -31,8 +36,8 @@ final class DeployRsyncCommand extends Command
     public const TARGET_SSH_REGEX = '/^ssh:\/\/(?<username>.+)@(?<hostname>[^:]+)(:(?<port>\d+)){0,1}:(?<path>.+)$/';
 
     /**
-     * @param array<string, array{target: string, rsync_options?: string[], ignore_file?: string}> $environments
-     * @param array{rsync_path: string, rsync_options: string[], ignore_file: ?string}             $rsyncConfig
+     * @param Environments $environments
+     * @param RsyncConfig  $rsyncConfig
      */
     public function __construct(protected array $environments, protected array $rsyncConfig, protected string $projetDir)
     {

@@ -9,7 +9,7 @@
          bootstrap="vendor/autoload.php"
 >
     <extensions>
-        <extension class="Ecommit\DeployRsyncBundle\Tests\BypassFinalHook"/>
+        <bootstrap class="DG\BypassFinals\PHPUnitExtension"/>
     </extensions>
 
     <testsuites>

@@ -36,7 +36,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestSuccessProvider(): \Generator
+    public static function getTestSuccessProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -92,7 +92,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestSuccessGoProvider(): \Generator
+    public static function getTestSuccessGoProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -159,7 +159,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestSuccessWithoutIgnoreFileProvider(): \Generator
+    public static function getTestSuccessWithoutIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -227,7 +227,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestWithGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
+    public static function getTestWithGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -285,7 +285,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestWithoutGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
+    public static function getTestWithoutGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -345,7 +345,7 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function getTestWithEnvRsyncOptionsProvider(): \Generator
+    public static function getTestWithEnvRsyncOptionsProvider(): \Generator
     {
         yield ['env1', [
             'rsync',
@@ -412,13 +412,12 @@ class DeployRsyncCommandTest extends TestCase
     {
         $class = new \ReflectionClass(DeployRsyncCommand::class);
         $method = $class->getMethod('getDirPath');
-        $method->setAccessible(true);
         $command = new DeployRsyncCommand([], [], ''); // @phpstan-ignore-line
 
         $this->assertSame($expected, $method->invokeArgs($command, [$dir]));
     }
 
-    public function getTestGetDirPathProvider(): array
+    public static function getTestGetDirPathProvider(): array
     {
         return [
             ['dir', 'dir/'],

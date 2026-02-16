@@ -40,6 +40,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestSuccessProvider(): \Generator
     {
         yield ['env1', [
@@ -96,6 +99,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestSuccessGoProvider(): \Generator
     {
         yield ['env1', [
@@ -163,6 +169,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestSuccessWithoutIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
@@ -231,6 +240,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestWithGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
@@ -289,6 +301,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestWithoutGlobalIgnoreFileAndWithEnvIgnoreFileProvider(): \Generator
     {
         yield ['env1', [
@@ -349,6 +364,9 @@ class DeployRsyncCommandTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    /**
+     * @return \Generator<array-key, array{0: string, 1: string[]}, void, void>
+     */
     public static function getTestWithEnvRsyncOptionsProvider(): \Generator
     {
         yield ['env1', [

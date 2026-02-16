@@ -448,7 +448,7 @@ class DeployRsyncCommandTest extends TestCase
                     ->getMock();
 
                 $process->expects($this->once())->method('start');
-                $process->expects($this->once())->method('getIterator')->willReturnCallback(function () {
+                $process->expects($this->once())->method('getIterator')->willReturnCallback(static function () {
                     foreach (['line1', 'line2'] as $line) {
                         yield $line;
                     }
